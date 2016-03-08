@@ -3,6 +3,7 @@ import re
 component_re = re.compile(r'(\d+ | [a-z]+ | \.| -)', re.VERBOSE)
 replace = {'pre':'c', 'preview':'c','-':'final-','rc':'c','dev':'@'}.get
 
+
 def _parse_version_parts(s):
     for part in component_re.split(s):
         part = replace(part,part)
@@ -14,6 +15,7 @@ def _parse_version_parts(s):
             yield '*'+part
 
     yield '*final'  # ensure that alpha/beta/candidate are before final
+
 
 def parse_version(s):
     parts = []

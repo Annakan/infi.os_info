@@ -1,6 +1,23 @@
 __import__("pkg_resources").declare_namespace(__name__)
 
 import platform
+import os
+
+def get_extended_platform_info(platform_module=platform):
+    system = platform_module.system().lower().replace('-', '').replace('_', '')
+    from collections import defaultdict
+
+    def split_file(file_path): return {key.strip(): value.strip() for (key, value) in (line.split('=') for line in open(file_path, 'r').readlines())}
+
+    if system == 'linux':
+        try:
+            os_release = split_file(r'/etc/os-release')
+        except IOError:
+            os_release = defaultdict(str)
+        try:
+            lsb_release = split_file(r'/etc/lsb-release')
+        except IOError:
+            lsb_release = defaultdict(str)
 
 
 def get_platform_string(platform_module=platform):
@@ -8,14 +25,20 @@ def get_platform_string(platform_module=platform):
     system = platform_module.system().lower().replace('-', '').replace('_', '')
     if system == 'linux':
         dist_long, version, version_id = platform_module.linux_distribution()
-        # We remove the linux string for centos (so it won't be centoslinux)
-        dist_name = ''.join(dist_long.split(' ')[:2]).lower().replace('linux','')
-        if dist_name == 'ubuntu':
-            dist_version = version_id
-        elif dist_name == 'centos' or dist_name == 'redhat':
-            dist_version = version.split('.')[0]
+        if 'infi_dist_name' in os.environ['']:
+            dist_name = os.environ['infi_dist_name']
         else:
-            dist_version = version.split('.')[0]
+            # We remove the linux string for centos (so it won't be centoslinux)
+            dist_name = ''.join(dist_long.split(' ')[:2]).lower().replace('linux','')
+        if 'infi_dist_version' in os.environ['']:
+                dist_version = os.environ['infi_dist_version']
+        else:
+            if dist_name == 'ubuntu':
+                dist_version = version_id
+            elif dist_name == 'centos' or dist_name == 'redhat':
+                dist_version = version.split('.')[0]
+            else:
+                dist_version = version.split('.')[0]
         arch = 'x86' if '32bit' in platform_module.architecture() else 'x64'
         return "-".join([system, dist_name, dist_version , arch])
     if system == 'windows':
