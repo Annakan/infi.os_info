@@ -57,3 +57,6 @@ buildout.in
 
 src/infi/os_info/__version__.py
 bootstrap.py
+
+#ides
+.idea/

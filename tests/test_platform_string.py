@@ -1,6 +1,6 @@
 from infi import unittest
 from infi.os_info import get_platform_string
-
+from os import environ
 
 test_subjects = [
     dict(expected='linux-ubuntu-quantal-x64', system='Linux', architecture=('64bit', 'ELF'), processor='x86_64', release='3.5.0-40-generic', mac_ver=('', ('', '', ''), ''), linux_distribution=('Ubuntu', '12.10', 'quantal')),
@@ -143,4 +143,16 @@ class PlatformStringTestCase(unittest.TestCase):
     @unittest.parameters.iterate('test_subject', test_subjects)
     def test_platform_string(self, test_subject):
         expected = test_subject.pop('expected')
+        self.assertEquals(expected, get_platform_string(FakePlatformMorule(**test_subject)))
+
+
+class PlatformStringEnvironOverrideTestCase(unittest.TestCase):
+    environ['infi_dist_name'] = "xxx"
+    environ['infi_dist_version'] = "yyy"
+
+    @unittest.parameters.iterate('test_subject', test_subjects)
+    def test_platform_environ_override_string(self, test_subject):
+        expected = test_subject.pop('expected').split('-')
+        expected = "xxx-yyy-{}-{}".format(expected[2], expected[3])
+
         self.assertEquals(expected, get_platform_string(FakePlatformMorule(**test_subject)))

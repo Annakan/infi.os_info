@@ -7,7 +7,7 @@ def get_extended_platform_info(platform_module=platform):
     system = platform_module.system().lower().replace('-', '').replace('_', '')
     from collections import defaultdict
 
-    def split_file(file_path): return {key.strip(): value.strip() for (key, value) in (line.split('=') for line in open(file_path, 'r').readlines())}
+    def split_file(file_path): return {key.strip(' "\''): value.strip(' "\'\n') for (key, value) in (line.split('=') for line in open(file_path, 'r').readlines())}
 
     if system == 'linux':
         try:
@@ -18,6 +18,7 @@ def get_extended_platform_info(platform_module=platform):
             lsb_release = split_file(r'/etc/lsb-release')
         except IOError:
             lsb_release = defaultdict(str)
+    return os_release, lsb_release
 
 
 def get_platform_string(platform_module=platform):
