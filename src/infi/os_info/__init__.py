@@ -26,12 +26,12 @@ def get_platform_string(platform_module=platform):
     system = platform_module.system().lower().replace('-', '').replace('_', '')
     if system == 'linux':
         dist_long, version, version_id = platform_module.linux_distribution()
-        if 'infi_dist_name' in os.environ['']:
+        if 'infi_dist_name' in os.environ:
             dist_name = os.environ['infi_dist_name']
         else:
             # We remove the linux string for centos (so it won't be centoslinux)
             dist_name = ''.join(dist_long.split(' ')[:2]).lower().replace('linux','')
-        if 'infi_dist_version' in os.environ['']:
+        if 'infi_dist_version' in os.environ:
                 dist_version = os.environ['infi_dist_version']
         else:
             if dist_name == 'ubuntu':

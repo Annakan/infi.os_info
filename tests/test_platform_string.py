@@ -1,6 +1,7 @@
 from infi import unittest
 from infi.os_info import get_platform_string
 from os import environ
+from copy import  deepcopy
 
 test_subjects = [
     dict(expected='linux-ubuntu-quantal-x64', system='Linux', architecture=('64bit', 'ELF'), processor='x86_64', release='3.5.0-40-generic', mac_ver=('', ('', '', ''), ''), linux_distribution=('Ubuntu', '12.10', 'quantal')),
@@ -140,19 +141,28 @@ class FakePlatformMorule(object):
 
 
 class PlatformStringTestCase(unittest.TestCase):
-    @unittest.parameters.iterate('test_subject', test_subjects)
+    @unittest.parameters.iterate('test_subject', deepcopy(test_subjects))
     def test_platform_string(self, test_subject):
         expected = test_subject.pop('expected')
         self.assertEquals(expected, get_platform_string(FakePlatformMorule(**test_subject)))
 
 
 class PlatformStringEnvironOverrideTestCase(unittest.TestCase):
-    environ['infi_dist_name'] = "xxx"
-    environ['infi_dist_version'] = "yyy"
 
-    @unittest.parameters.iterate('test_subject', test_subjects)
+    @classmethod
+    def setUpClass(cls):
+        environ['infi_dist_name'] = "xxx"
+        environ['infi_dist_version'] = "yyy"
+
+    @unittest.parameters.iterate('test_subject', deepcopy(test_subjects))
     def test_platform_environ_override_string(self, test_subject):
-        expected = test_subject.pop('expected').split('-')
-        expected = "xxx-yyy-{}-{}".format(expected[2], expected[3])
-
+        expected = test_subject.pop('expected')
+        expected_split = expected.split('-')
+        if expected_split[0] == "linux":
+            expected = "{}-xxx-yyy-{}".format(expected_split[0], expected_split[3])
         self.assertEquals(expected, get_platform_string(FakePlatformMorule(**test_subject)))
+
+    @classmethod
+    def tearDownClass(cls):
+        del environ['infi_dist_name']
+        del environ['infi_dist_version']
