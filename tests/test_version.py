@@ -8,14 +8,15 @@ class VersionTestCase(unittest.TestCase):
 
     def test_git(self):
         git_version = shorten_version_string(get_version_from_git())
-        git_versionlist = git_version.split('.')
+        git_versionlist = [int(n) for n in git_version.split('.')]
         self.assertEquals(len(git_versionlist), 4)
-        self.assertGreater(int(git_versionlist[0]), 0)
+        self.assertGreater(sum(git_versionlist), 0)
+
 
     def test_file(self):
         current_path = path.dirname(path.realpath(__file__))
-        filepath = path.abspath(path.join(current_path, '..', 'src', 'infi', 'os_info', '__version__.py'))
-        file_version = shorten_version_string(get_version_from_file(filepath))
+        file_path = path.abspath(path.join(current_path, '..', 'src', 'infi', 'os_info', '__version__.py'))
+        file_version = shorten_version_string(get_version_from_file(file_path))
         file_version_list = file_version.split('.')
         self.assertEquals(len(file_version_list), 3)
 
