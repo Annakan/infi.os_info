@@ -1,7 +1,8 @@
+# coding=utf8
 from infi import unittest
 from infi.os_info import get_platform_string
 from os import environ
-from copy import  deepcopy
+from copy import deepcopy
 
 test_subjects = [
     dict(expected='linux-ubuntu-quantal-x64', system='Linux', architecture=('64bit', 'ELF'), processor='x86_64', release='3.5.0-40-generic', mac_ver=('', ('', '', ''), ''), linux_distribution=('Ubuntu', '12.10', 'quantal')),
@@ -128,7 +129,7 @@ test_subjects = [
 ]
 
 
-class FakePlatformMorule(object):
+class FakePlatformModule(object):
     """:param platform_module: a platform-like module that implements system, architecture, processor, release, mac_ver, linux_distribution"""
 
     def __init__(self, system, architecture, processor, release, mac_ver, linux_distribution):
@@ -144,7 +145,7 @@ class PlatformStringTestCase(unittest.TestCase):
     @unittest.parameters.iterate('test_subject', deepcopy(test_subjects))
     def test_platform_string(self, test_subject):
         expected = test_subject.pop('expected')
-        self.assertEquals(expected, get_platform_string(FakePlatformMorule(**test_subject)))
+        self.assertEquals(expected, get_platform_string(FakePlatformModule(**test_subject)))
 
 
 class PlatformStringEnvironOverrideTestCase(unittest.TestCase):
@@ -160,7 +161,7 @@ class PlatformStringEnvironOverrideTestCase(unittest.TestCase):
         expected_split = expected.split('-')
         if expected_split[0] == "linux":
             expected = "{}-xxx-yyy-{}".format(expected_split[0], expected_split[3])
-        self.assertEquals(expected, get_platform_string(FakePlatformMorule(**test_subject)))
+        self.assertEquals(expected, get_platform_string(FakePlatformModule(**test_subject)))
 
     @classmethod
     def tearDownClass(cls):
